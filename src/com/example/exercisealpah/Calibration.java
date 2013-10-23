@@ -1,16 +1,24 @@
 package com.example.exercisealpah;
 
+import java.io.Serializable;
+import java.lang.reflect.Type; //this is the correct type
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -18,16 +26,16 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class Calibration extends Activity implements SensorEventListener,
-OnClickListener {
-
+OnClickListener,Serializable {
+	
+	public static final String PREF_NAME = "caliPrefs";
+ 
 	// this stuff is for the dispaly
 	private SensorManager sensorManager;
-	private Button btnStart, btnStop;
+	private Button btnStart, btnStop,btnRead;
 	private boolean started = false;
 	private ArrayList<AccelData> sensorData; 
 	private LinearLayout layout;
-	private View mChart;
-
 	long myT,biggestTime,totalTime;
 	int max;
 	// this is used for calucation
@@ -41,22 +49,28 @@ OnClickListener {
 		setContentView(R.layout.activity_calibration);
 		layout = (LinearLayout) findViewById(R.id.chart_container);
 		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		sensorData = new ArrayList<AccelData>();
+		
+		/*
+		sensorData = readSharedPrefrence();
+		
+		if(sensorData == null){
+			sensorData = new ArrayList<AccelData>();
+		}
+		*/
+		
+		
 		myValues = new ArrayList<Double>();
 		times = new ArrayList<Long>();
 
 		btnStart = (Button) findViewById(R.id.btnStart);
 		btnStop = (Button) findViewById(R.id.btnStop);
-		//btnUpload = (Button) findViewById(R.id.btnUpload);
+		btnRead = (Button) findViewById(R.id.btnUpload);
 		btnStart.setOnClickListener(this);
 		btnStop.setOnClickListener(this);
-		//btnUpload.setOnClickListener(this);
+		btnRead.setOnClickListener(this);
 		btnStart.setEnabled(true);
 		btnStop.setEnabled(false);
-		if (sensorData == null || sensorData.size() == 0) {
-			//	btnUpload.setEnabled(false);
-		}
-
+		btnRead.setEnabled(true);
 	}
 
 	@Override
@@ -89,6 +103,37 @@ OnClickListener {
 			sensorData.add(data);
 		}
 	}
+	
+	
+	@SuppressLint("NewApi")
+	public void sharedPrefrenceSave(){
+		SharedPreferences sPrefs = getSharedPreferences(PREF_NAME,0);
+		SharedPreferences.Editor sEdit = sPrefs.edit();
+		Gson gson = new Gson();
+		//converts the arraylist to string 
+		String accelVals = gson.toJson(sensorData);
+		sEdit.putString("myData", accelVals).commit();//save the arraylist as a string
+	}
+	
+	public ArrayList<AccelData> readSharedPrefrence(){
+		SharedPreferences sPrefs =  getSharedPreferences(PREF_NAME,0);
+		Gson gson = new Gson();
+		String json = sPrefs.getString("myData", "failed");
+		if(json.equals("failed")){
+			return null;
+		}
+		Type type = new TypeToken<ArrayList<AccelData>>(){}.getType();
+		
+		ArrayList<AccelData> temp = gson.fromJson(json,type);
+		calcLift(temp);
+		
+		// make the type for Gson
+		return temp ;// get the Json object back to a acclData obj
+		
+		
+	}
+		
+	
 	/**************************************
 	 * this method is used to calculate lifting
 	 * it gets the lagrest and smallest values from the array
@@ -107,12 +152,10 @@ OnClickListener {
 
 		double myY;
 		max = liftingObj.size();
-		//double gravity = 9.81; // still no idea why i need gravity 
-		//maybe a physics thing like a ball for example,time it takes 
-		//for a ball to hit the ground and then bounce back up? 
 
 		// gets all the why values of my object. for some reason
 		for(int i =0; i < max; i++){
+			
 			//get the accel data out of the array
 			AccelData currentObj = liftingObj.get(i);
 
@@ -136,21 +179,11 @@ OnClickListener {
 			totalTime = totalTime + i;
 		}
 
-
-
-
-		//these method are really for the rep class/unction class
-		//they are used to show when the user is a point a(min) and point b(max)
-		// when they are near min and max that means they completed 1 rep
-
 		//get the biggest time 
 		double Biggest =  Collections.max(myValues);
 
 		//get the biggest time
 		biggestTime = Collections.max(times);
-
-
-
 
 		// finds the samllest Y value in the array, Bottom 	
 		double Smallest = Collections.min(myValues);
@@ -167,6 +200,7 @@ OnClickListener {
 		case R.id.btnStart:
 			btnStart.setEnabled(false);
 			btnStop.setEnabled(true);
+			btnRead.setEnabled(true);
 			sensorData = new ArrayList<AccelData>();
 			// save prev data if available
 			started = true;
@@ -178,11 +212,13 @@ OnClickListener {
 		case R.id.btnStop:
 			btnStart.setEnabled(true);
 			btnStop.setEnabled(false);
-			//btnUpload.setEnabled(true);
+			btnRead.setEnabled(true);
 			started = false;
 			sensorManager.unregisterListener(this);
 			layout.removeAllViews();
 			calcLift(sensorData);
+//			SaveData();
+			sharedPrefrenceSave();
 			//openChart();
 			//pass intent to function screen
 			Intent intent = new Intent(Calibration.this,Function.class);
@@ -201,7 +237,37 @@ OnClickListener {
 			// show data in chart
 			break;
 		case R.id.btnUpload:
-
+			btnStart.setEnabled(true);
+			btnStop.setEnabled(false);
+			btnRead.setEnabled(true);
+			sensorData = readSharedPrefrence();
+			Intent intent2 = null;
+			if(sensorData == null){
+				Log.e("DEBUG", "no data in here");
+				intent2 = new Intent(Calibration.this,Calibration.class);
+				intent2.putExtra("readFailed", "readFailed");
+				startActivity(intent2);
+				finish();
+			}
+			else{
+				
+					Log.e("DEBUG", "readbutton, we have data!");
+				//pass intent to function screen
+				intent2 = new Intent(Calibration.this,Function.class);
+	
+				//give function the calibration sensor array
+				intent2.putExtra("time", biggestTime);
+	
+				///pass on the total time
+				intent2.putExtra("totalTime",totalTime);
+	
+				intent2.putExtra("arrayLength", max);
+	
+				//start the activity
+				startActivity(intent2);
+			}
+			
+			
 			break;
 		default:
 			break;

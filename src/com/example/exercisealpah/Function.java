@@ -2,11 +2,13 @@ package com.example.exercisealpah;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,17 +16,11 @@ import android.widget.Toast;
 
 public class Function extends Activity {
 
-	Button timeB,errorB;
-	EditText timeF,errorF; 
+	Button timeB,nextB;
+	EditText timeF; 
 	Editable myTime;
-	Editable myError;
-
-	Intent intent = getIntent();
-	int length = intent.getIntExtra("arrayLength",1);
-
-	//get the calibation data
-	//Calibration myObj = new Calibration();
-
+	int arrayWidth;
+	int length;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,28 +28,59 @@ public class Function extends Activity {
 		setContentView(R.layout.activity_function);
 
 		//get the users time from the screen
-		timeB =(Button)findViewById(R.id.SetTime);
-		timeF =(EditText)findViewById(R.id.userTime);
+		
+		timeF = (EditText)findViewById(R.id.userTime);
+		
+		buttonListioner();
 
-		//get the users margin of error
-		errorB =(Button)findViewById(R.id.SetErrorButton);
-		errorF =(EditText)findViewById(R.id.SetErrorField);
+		buttonChangeScreens();
+	}//end on create
+	
+	
+		public void buttonChangeScreens(){
+			nextB =(Button)findViewById(R.id.buttonNext);
+			
+			nextB.setOnClickListener(new OnClickListener(){
+				public void onClick(View z){
+					Intent newintent = new Intent(Function.this,Movment.class);
+					
+				//	newintent.putExtra("arrayWidth",arrayWidth);
+				//	newintent.putExtra("arrayLength",length);
+					
+					startActivity(newintent);
+					
+				}
+			});
+		}
+	
+	
+		public void buttonListioner(){
+	
+			timeB =(Button)findViewById(R.id.SetTime);
+			
+			
+			
+			
+			timeB.setOnClickListener(new OnClickListener(){
+				
+			
+				public void onClick(View v){
+					//when you click the time button
+					
+					if(timeF.getText().toString().equals("") || timeF == null){
+						timeF.setHintTextColor(Color.RED);
+						timeF.setHint("Input Invalid");
+						
+						
+						return;
+					}
 
-		//when you click the time button
-		timeB.setOnClickListener( 
-				new View.OnClickListener() 
-				{
-
-					@Override
-					public void onClick(View v) {
-						// TODO Auto-generated method stub
 						Log.e("DEBUG", "timeButton Click");
 
+						Intent intent = getIntent();
 						//get the biggest time from sensor data
 
-
-						//this is the biggest time
-						//long apples = intent.getLongExtra("time", 1);
+						 length = intent.getIntExtra("arrayLength",1);
 
 						//this is the total time
 						long myTotalTime = intent.getLongExtra("totalTime",1);
@@ -66,42 +93,17 @@ public class Function extends Activity {
 						int totalTimeFixed = (int) (myTotalTime/100000000000000L);
 
 						//get the users time divided by the total time
-						int arrayWidth = (userTime/totalTimeFixed);
+						 arrayWidth = 2* (userTime/totalTimeFixed);
 						
 						//see if its being calculated
 						Toast tost = Toast.makeText(getApplicationContext(), "fixed time: "+totalTimeFixed+"\n"+"division is: "+ arrayWidth,
 								Toast.LENGTH_SHORT);
 						tost.show();
-					}
-				});
-
-		//when you click the set error button
-		errorB.setOnClickListener( 
-				new View.OnClickListener() 
-				{
-
-					@Override
-					public void onClick(View v) {
-						// TODO Auto-generated method stub
-						Log.e("DEBUG", "errorButton Click");
-
-						//get the users data from the text field
-						myError = errorF.getText();
-					}
-
-					//call the next intent for userScreen
-				});
-
-
-	}
-
-
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.function, menu);
-		return true;
-	}
-
-}
+					}// end on click
+			});//end set on click method
+		}//end button listenor
+	
+	
+	
+	
+}//end class

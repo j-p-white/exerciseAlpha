@@ -1,6 +1,8 @@
 package com.example.exercisealpah;
 
-public class AccelData {
+import java.io.Serializable;
+
+public class AccelData implements Serializable{
 	private long timestamp;
 	private double x;
 	private double y;

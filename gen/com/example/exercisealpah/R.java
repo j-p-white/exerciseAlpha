@@ -28,28 +28,27 @@ public final class R {
         public static final int stop_btn5=0x7f020004;
     }
     public static final class id {
-        public static final int SetErrorButton=0x7f080008;
-        public static final int SetErrorField=0x7f08000b;
-        public static final int SetTime=0x7f08000a;
-        public static final int action_settings=0x7f08000c;
+        public static final int SetTime=0x7f080008;
+        public static final int action_settings=0x7f08000a;
         public static final int btnStart=0x7f080001;
         public static final int btnStop=0x7f080002;
         public static final int btnUpload=0x7f080003;
+        public static final int buttonNext=0x7f080009;
         public static final int buttons=0x7f080000;
         public static final int chart_container=0x7f080004;
         public static final int myvideoview=0x7f080005;
-        public static final int textView1=0x7f080006;
-        public static final int textView2=0x7f080007;
-        public static final int userTime=0x7f080009;
+        public static final int textView1=0x7f080007;
+        public static final int userTime=0x7f080006;
     }
     public static final class layout {
         public static final int activity_calibration=0x7f030000;
         public static final int activity_exercise=0x7f030001;
         public static final int activity_function=0x7f030002;
         public static final int activity_main=0x7f030003;
-        public static final int activity_test=0x7f030004;
-        public static final int activity_welcome=0x7f030005;
-        public static final int test=0x7f030006;
+        public static final int activity_movment=0x7f030004;
+        public static final int activity_test=0x7f030005;
+        public static final int activity_welcome=0x7f030006;
+        public static final int test=0x7f030007;
     }
     public static final class menu {
         public static final int activity_test=0x7f070000;
@@ -57,7 +56,8 @@ public final class R {
         public static final int exercise=0x7f070002;
         public static final int function=0x7f070003;
         public static final int main=0x7f070004;
-        public static final int welcome=0x7f070005;
+        public static final int movment=0x7f070005;
+        public static final int welcome=0x7f070006;
     }
     public static final class string {
         public static final int action_settings=0x7f050001;
@@ -71,6 +71,7 @@ public final class R {
          */
         public static final int title_activity_exercise=0x7f050006;
         public static final int title_activity_function=0x7f050009;
+        public static final int title_activity_movment=0x7f05000c;
         public static final int title_activity_options=0x7f050005;
         public static final int title_activity_welcome=0x7f050003;
         public static final int welcome=0x7f050004;

@@ -21,27 +21,28 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>        
-        
+        </activity>
         <activity
             android:name="com.example.exercisealpah.Exercise"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_exercise"
             android:screenOrientation="landscape" >
         </activity>
-        
-        
         <activity
             android:name="com.example.exercisealpah.Calibration"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_calibration"
-            android:screenOrientation="landscape" >
+            android:screenOrientation="portrait" >
         </activity>
-        
-        
         <activity
             android:name="com.example.exercisealpah.Function"
-            android:label="@string/title_activity_function" >
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_function"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.example.exercisealpah.Movment"
+            android:label="@string/title_activity_movment" >
         </activity>
     </application>
 

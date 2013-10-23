@@ -8,16 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Function" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_below="@+id/SetErrorButton"
-        android:layout_marginTop="140dp"
-        android:text="@string/time_for_activity"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
     <EditText
         android:id="@+id/userTime"
         android:layout_width="wrap_content"
@@ -38,34 +28,20 @@
         android:layout_alignParentLeft="true"
         android:text="@string/set" />
 
-    <Button
-        android:id="@+id/SetErrorButton"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/SetErrorField"
-        android:layout_alignParentLeft="true"
-        android:text="errorSet" />
-
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/SetErrorField"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="14dp"
-        android:layout_marginTop="36dp"
-        android:text="set Error"
+        android:text="@string/time_for_activity"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <EditText
-        android:id="@+id/SetErrorField"
+    <Button
+        android:id="@+id/buttonNext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/textView2"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:inputType="number" />
-   
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="99dp"
+        android:text="next" />
+
 </RelativeLayout>
