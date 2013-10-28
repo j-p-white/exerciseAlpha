@@ -1,3 +1,6 @@
+
+
+
 package com.example.exercisealpah;
 
 import java.io.Serializable;
@@ -38,6 +41,7 @@ OnClickListener,Serializable {
 	private LinearLayout layout;
 	long myT,biggestTime,totalTime;
 	int max;
+	double [] gravity;
 	// this is used for calucation
 	// stors the Y values 
 	public ArrayList<Double> myValues;
@@ -61,7 +65,8 @@ OnClickListener,Serializable {
 		
 		myValues = new ArrayList<Double>();
 		times = new ArrayList<Long>();
-
+		gravity = new double[3];
+		
 		btnStart = (Button) findViewById(R.id.btnStart);
 		btnStop = (Button) findViewById(R.id.btnStop);
 		btnRead = (Button) findViewById(R.id.btnUpload);
@@ -95,9 +100,18 @@ OnClickListener,Serializable {
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (started) {
-			double x = event.values[0];
-			double y = event.values[1];
-			double z = event.values[2];
+			
+			//get the gravity of the events 
+			final float alpha = (float) 0.8;
+			
+			gravity[0] = alpha *gravity[0] +(1 -alpha) *event.values[0];
+			gravity[1] = alpha *gravity[1] +(1 -alpha) *event.values[1];
+			gravity[2] = alpha *gravity[2] +(1 -alpha) *event.values[2];
+			
+			
+			double x = event.values[0] - gravity[0];
+			double y = event.values[1] - gravity[1];
+			double z = event.values[2] - gravity[2];
 			long timestamp = System.currentTimeMillis();
 			AccelData data = new AccelData(timestamp, x, y, z);
 			sensorData.add(data);
@@ -142,14 +156,6 @@ OnClickListener,Serializable {
 	 * i think there is a physics problem for this
 	 *******************************************/
 	public void calcLift(ArrayList<AccelData> liftingObj){
-
-		//in this method i could also make the make gradient method
-		// this method would call my array of data points 
-		// modify all the points in the array by a little bit 
-		// and gave them into a positive gradent and negative gradent array
-
-		//get variables 
-
 		double myY;
 		max = liftingObj.size();
 
