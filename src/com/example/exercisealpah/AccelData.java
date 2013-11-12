@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class AccelData implements Serializable{
 	private long timestamp;
+	private long syncStamp;
 	private double x;
 	private double y;
 	private double z;
@@ -22,6 +23,13 @@ public class AccelData implements Serializable{
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
+	public long getSyncStamp(){
+		return syncStamp;
+	}
+	public void setSyncStamp(long syncStamp){
+		this.syncStamp = syncStamp;
+	}
+	
 	public double getX() {
 		return x;
 	}

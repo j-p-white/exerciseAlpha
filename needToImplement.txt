@@ -1,2 +1,9 @@
 timer for calibration :- beeper,strap,record movement
+fix sync propblem, myabe sync points 
+slow down sensor and get less points 
+only one movement for calibration 
+compare points and find the diffrence 
+display chart and diffrence in a seprate progress screen later
+fix old screens 
+test!!!
 

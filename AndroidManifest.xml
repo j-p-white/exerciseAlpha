@@ -35,13 +35,13 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.example.exercisealpah.Function"
+            android:name="com.example.exercisealpah.UserTime"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_function"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.example.exercisealpah.Movment"
+            android:name="com.example.exercisealpah.Preforme"
             android:label="@string/title_activity_movment"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait" >
