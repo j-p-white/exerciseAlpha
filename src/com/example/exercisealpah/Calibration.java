@@ -45,6 +45,8 @@ OnClickListener,Serializable {
         int max;
         int maxPoints =0;
         double [] gravity;
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + 3*1000;
         // this is used for calucation
         // stors the Y values 
         public ArrayList<Double> myValues;
@@ -58,13 +60,7 @@ OnClickListener,Serializable {
                 sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
                 notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                myRing = RingtoneManager.getRingtone(getApplicationContext(), notification);
-                /*
-                sensorData = readSharedPrefrence();
-                
-                if(sensorData == null){
-                        sensorData = new ArrayList<AccelData>();
-                }
-                */
+
                 myValues = new ArrayList<Double>();
                 times = new ArrayList<Long>();
                 gravity = new double[3];
@@ -101,7 +97,7 @@ OnClickListener,Serializable {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-                if (started) {
+               if (started ) {
                         
                         //get the gravity of the events 
                         final float alpha = (float) 0.8;
@@ -117,7 +113,15 @@ OnClickListener,Serializable {
                         long timestamp = System.currentTimeMillis();
                         AccelData data = new AccelData(timestamp, x, y, z);
                         sensorData.add(data);
+                       
                 }
+               if(sensorData.size() == 37){
+            	   max = sensorData.size();
+            	   Log.d("calibrationCount", "calibCount: "+sensorData.size());
+            	   sensorManager.unregisterListener(this);
+            	   myRing.play();
+            	   started = false;
+               }
         }
         
         
@@ -141,7 +145,7 @@ OnClickListener,Serializable {
                 Type type = new TypeToken<ArrayList<AccelData>>(){}.getType();
                 
                 ArrayList<AccelData> temp = gson.fromJson(json,type);
-                calcLift(temp);
+                
                 
                 // make the type for Gson
                 return temp ;// get the Json object back to a acclData obj
@@ -149,58 +153,6 @@ OnClickListener,Serializable {
                 
         }
                 
-        
-        /**************************************
-         * this method is used to calculate lifting
-         * it gets the lagrest and smallest values from the array
-         * this method needed a lot of comments and 
-         * does not make a lot of sense what i did here
-         * i think there is a physics problem for this
-         *******************************************/
-        public void calcLift(ArrayList<AccelData> liftingObj){
-                double myY;
-                max = liftingObj.size();
-
-                // gets all the why values of my object. for some reason
-                for(int i =0; i < max; i++){
-                        
-                        //get the accel data out of the array
-                        AccelData currentObj = liftingObj.get(i);
-
-                        //pick only the Y data
-                        myY = currentObj.getY();
-
-                        //pick only the time
-                        myT = currentObj.getTimestamp();
-
-                        //store my times
-                        times.add(myT);
-
-                        //store all they Y data in its own array
-                        myValues.add(myY);
-
-                }
-                //for each value in the times array
-                for(long i: times){
-
-                        //store the values in total time
-                        totalTime = totalTime + i;
-                }
-
-                //get the biggest time 
-                double Biggest =  Collections.max(myValues);
-
-                //get the biggest time
-                biggestTime = Collections.max(times);
-
-                // finds the samllest Y value in the array, Bottom         
-                double Smallest = Collections.min(myValues);
-
-                //displays the biggest and smallest values to see if it was working
-                Toast toast = Toast.makeText(getApplicationContext(), "Biggest:"+ Biggest +"\n"+"Smallest:"+ Smallest
-                                +"\n"+"BiggestIme: "+ biggestTime +" \n"+"totalTime: "+totalTime, Toast.LENGTH_LONG);
-                toast.show();
-        }
 
         @Override
         public void onClick(View v) {
@@ -220,23 +172,12 @@ OnClickListener,Serializable {
 					}
                         Log.d("start", "START");
                         myRing.play();
-                        while(maxPoints < 1){
+                        
                         	Sensor accel = sensorManager
                                         .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
                         	sensorManager.registerListener(this, accel,
-                                        SensorManager.SENSOR_DELAY_FASTEST);
+                                        SensorManager.SENSOR_DELAY_NORMAL);
                         	
-                        	try {
-								Thread.sleep(1*1000);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-                        	sensorManager.unregisterListener(this);
-                        	maxPoints++;
-                        }// end while
-                        myRing.play();
-                        
                         break;
                 case R.id.btnStop:
                         btnStart.setEnabled(true);
@@ -245,18 +186,10 @@ OnClickListener,Serializable {
                         started = false;
                         sensorManager.unregisterListener(this);
                         layout.removeAllViews();
-                        calcLift(sensorData);
-//                        SaveData();
                         sharedPrefrenceSave();
-                        //openChart();
+                        
                         //pass intent to function screen
                         Intent intent = new Intent(Calibration.this,UserTime.class);
-
-                        //give function the calibration sensor array
-                       // intent.putExtra("time", biggestTime);
-
-                        ///pass on the total time
-                      //  intent.putExtra("totalTime",totalTime);
 
                         intent.putExtra("arrayLength", max);
 

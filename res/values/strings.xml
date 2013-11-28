@@ -15,5 +15,7 @@
     <string name="set">Set</string>
     <string name="time_for_activity">time for activity</string>
     <string name="title_activity_movment">Movment</string>
+    <string name="title_activity_you_tube">YouTube</string>
+    <string name="title_activity_progress">Progress</string>
 
 </resources>

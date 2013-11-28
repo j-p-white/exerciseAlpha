@@ -17,6 +17,7 @@ import com.google.gson.reflect.TypeToken;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -44,28 +45,43 @@ public class Preforme extends Activity implements SensorEventListener,
     private boolean started,storePoint = false;
     private ArrayList<AccelData> sensorData,calibration,displayMaster,copySensor;
     private ArrayList<ArrayList<AccelData>> masterArray;
+    private ArrayList<Double> calibY,masterY;
+    		double[] diffrence;
     		double [] gravity;
+    		int amountTime;
     		int somePoints =0,totalPoints =0;
     private LinearLayout layout;
     private View mChart;
+
  
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movment);
+        
+        //android layouts and sensor handlers
         layout = (LinearLayout) findViewById(R.id.chart_container);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         r = RingtoneManager.getRingtone(getApplicationContext(), notification);
         gravity = new double[3];
         
+        //calcLifts
+        calibY = new ArrayList<Double>();
+        masterY = new ArrayList<Double>();
+        
+        Intent intent = getIntent();
+        amountTime = intent.getIntExtra("amount",-1);
+        
+        
         //all of my sensor arrays
         sensorData = new ArrayList<AccelData>();
-       // copySensor = new ArrayList<AccelData>();
+        copySensor = new ArrayList<AccelData>();
         calibration = new ArrayList<AccelData>();
         displayMaster = new ArrayList<AccelData>();
         masterArray = new ArrayList<ArrayList<AccelData>>();
         calibration = readSharedPrefrence();//read in the array from the file
+        calibY = calcLift(calibration);
         
         
         
@@ -89,14 +105,58 @@ public class Preforme extends Activity implements SensorEventListener,
  
     }
     
-	/**************************************
-	 * this method is used to calculate lifting
-	 * it gets the lagrest and smallest values from the array
-	 * this method needed a lot of comments and 
-	 * does not make a lot of sense what i did here
-	 * i think there is a physics problem for this
-	 *******************************************/
-	public void calcLift(ArrayList<AccelData> liftingObj){
+    public void getDataParsed(ArrayList<AccelData> copySensor){
+    	// variables
+    	ArrayList<AccelData>list = new ArrayList<AccelData>();
+    	int count =0;
+    	
+    	for(int i1 =0; i1 < copySensor.size();i1++){
+    				       //here need more work!
+    					if(i1 == 37){
+    						count++;
+    						//for all the elements up to 37
+    						for(int i2 =0; i2 < i1;i2++){
+    							list.add(copySensor.remove(i2));
+    						}
+    						masterArray.add(list);
+    						Log.d("count", "masterSize: "+masterArray.size());
+    						i1 =0;
+    						Log.d("amount","parsedData: "+count+" times");
+    					}
+    	}// end for
+    }//end method
+    public double[] processData(ArrayList<Double> calibY){
+    	ArrayList<Double> fixedMaster = new ArrayList<Double>();
+    	double masterVal;
+    	double calibVal;
+    	double totalDiff = 0;
+    	double [] savedDiff = new double[masterArray.size()];
+    	int amount =0;
+    	for(ArrayList<AccelData>temp:masterArray){	
+    					fixedMaster = calcLift(temp);
+    	
+    		//compare the two lists 
+    				for(int i =0; i < calibY.size();i++){
+    					 masterVal = fixedMaster.get(i);
+    					  calibVal = calibY.get(i);
+    					  
+    					  totalDiff+= (masterVal - calibVal)/calibVal;	
+    					
+    			          masterVal =0;
+    			          calibVal = 0;
+    					  
+    					  Log.d("tag", "totalDiff: "+totalDiff);
+    				}//end for
+    				savedDiff[amount] = totalDiff;
+    				amount++;
+    	}//end foreach
+    	Log.d("","savedDiff size: "+savedDiff.length);
+    	return savedDiff;
+    }// end method
+    
+    
+    
+	public ArrayList<Double> calcLift(ArrayList<AccelData> liftingObj){
 		double myY;
 		ArrayList<Double> caliYValues = new ArrayList<Double>();
 		int max = liftingObj.size();
@@ -111,12 +171,11 @@ public class Preforme extends Activity implements SensorEventListener,
 			myY = currentObj.getY();
 
 			//store all they Y data in its own array
-			caliYValues.add(myY);
+			 caliYValues.add(myY);
 
 		}
-		//displays the biggest and smallest values to see if it was working
-		Toast toast = Toast.makeText(getApplicationContext(),"have calibration", Toast.LENGTH_LONG);
-		toast.show();
+		
+		return caliYValues;
 	}
     
     
@@ -132,7 +191,7 @@ public class Preforme extends Activity implements SensorEventListener,
 		Type type = new TypeToken<ArrayList<AccelData>>(){}.getType();
 		
 		ArrayList<AccelData> temp = gson.fromJson(json,type);
-		calcLift(temp);
+		//calcLift(temp);
 		
 		// make the type for Gson
 		return temp ;// get the Json object back to a acclData obj	
@@ -153,9 +212,12 @@ public class Preforme extends Activity implements SensorEventListener,
  
     @Override
     public void onSensorChanged(SensorEvent event) {
+    	int stopCount = 0;
+    	Sensor accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (started) {
 			//get the gravity of the events 
 			final float alpha = (float) 0.8;
+			
 			
 				gravity[0] = alpha *gravity[0] +(1 -alpha) *event.values[0];
 				gravity[1] = alpha *gravity[1] +(1 -alpha) *event.values[1];
@@ -167,15 +229,22 @@ public class Preforme extends Activity implements SensorEventListener,
 				long timestamp = System.currentTimeMillis();
 				AccelData data = new AccelData(timestamp, x, y, z);
 				sensorData.add(data);
-        }
-        	if(sensorData.size() == calibration.size()){
-        		
-        		//masterArray.add( (ArrayList<AccelData>) sensorData.clone());
-        		//unregister sensor data 
-        		sensorManager.unregisterListener(this);
-        		
-        		
-        	}
+				Log.d("count", "sensorSize: "+sensorData.size());
+
+        }//end if
+        
+    	if(sensorData.size() == calibration.size()*amountTime){
+    		//unregister sensor data 
+    		sensorManager.unregisterListener(this);
+    		r.play(); 	
+    		//masterArray.add(sensorData);
+    		copySensor = sensorData;
+    	
+
+    		
+    	}//end control if
+        
+        	
  
     }
  
@@ -187,53 +256,18 @@ public class Preforme extends Activity implements SensorEventListener,
             btnStop.setEnabled(true);
             btnUpload.setEnabled(false);
             sensorData = new ArrayList();
-            // save prev data if available
             started = true;
+            // save prev data if available
+          
+         //master is still broken-not saving sensorData 
             
-           // Sensor accel = sensorManager
-             //       .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            //sensorManager.registerListener(this, accel,
-              //      SensorManager.SENSOR_DELAY_NORMAL);
-            
-       //memory issue --maybe solved
-         
-           // while(totalPoints < 10){
             Sensor accel = sensorManager
                     .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            //amount of reps
-            while(somePoints < 3){
-         //   sensorData = new ArrayList();
 
             sensorManager.registerListener(this, accel,
                     SensorManager.SENSOR_DELAY_NORMAL);
-            try {
-            	//three secon reset time
-				Thread.sleep(3*1000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-            
-            	r.play();
-          /*  	
-            try {
-            	// time per rep
-				Thread.sleep(1*1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            */	
-        	masterArray.add(sensorData);//store the sensor data arrays
+            	
         	
-            somePoints++;
-            Log.d("maxPoints","somePoints: "+somePoints);
-        }// end little while
-           
-           // totalPoints++;
-            //}// end bigger while
-            
-            
             break;
         case R.id.btnStop:
             btnStart.setEnabled(true);
@@ -242,8 +276,17 @@ public class Preforme extends Activity implements SensorEventListener,
             started = false;
             sensorManager.unregisterListener(this);
             layout.removeAllViews();
-            openChart2();
- 
+            
+          getDataParsed(copySensor);
+          diffrence = processData(calibY);
+            
+           // openChart2();//never took the y out of master arrayValues
+            Intent lastScreen = new Intent(Preforme.this,Progress.class);
+            
+            lastScreen.putExtra("diffrence", diffrence);
+            
+            startActivity(lastScreen);
+            
             // show data in chart
             break;
         case R.id.btnUpload:
@@ -274,9 +317,9 @@ public class Preforme extends Activity implements SensorEventListener,
             
             displayMaster = masterArray.get(1);
             //sync the time stamps -- but something is not right
-         //   for(int i =0; i < calibration.size();i++){
-           // 	 displayMaster.get(i).setSyncStamp(calibration.get(i).getTimestamp());
-           // }
+            for(int i =0; i < calibration.size();i++){
+            	 displayMaster.get(i).setSyncStamp(calibration.get(i).getTimestamp());
+            }
             
             for(AccelData data : displayMaster){
             	yMaster.add(data.getTimestamp()-t, data.getY());
