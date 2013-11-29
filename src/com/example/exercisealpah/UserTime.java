@@ -21,6 +21,7 @@ public class UserTime extends Activity {
 	Editable myTime;
 	int amountFit;
 	int length;
+	int userTime;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class UserTime extends Activity {
 				public void onClick(View z){
 					Intent newintent = new Intent(UserTime.this,Preforme.class);
 					
-					newintent.putExtra("amount", amountFit);
+					newintent.putExtra("amount", userTime);
 					
 					startActivity(newintent);
 					
@@ -76,7 +77,7 @@ public class UserTime extends Activity {
 						 length = intent.getIntExtra("arrayLength",1);
 
 						//get users data from the TimeField
-						int userTime = Integer.parseInt(timeF.getText().toString());
+						 userTime = Integer.parseInt(timeF.getText().toString());
 
 						//how many times can calibration fit into the user time
 						  amountFit= userTime*length;

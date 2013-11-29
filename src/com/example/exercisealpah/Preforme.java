@@ -1,4 +1,3 @@
-//almost done, use calibration data in display
 
 package com.example.exercisealpah;
 import java.lang.reflect.Type;
@@ -164,7 +163,6 @@ public class Preforme extends Activity implements SensorEventListener,
     public void getDataParsed(ArrayList<AccelData> copySensor){
     	// variables
     	ArrayList<AccelData>list = new ArrayList<AccelData>();
-    	Log.d("", "copySensorSize: "+copySensor.size());
     	for(int i1 =0; i1 < copySensor.size();i1++){
     				       //here need more work!
     					if(i1 == 37){
@@ -173,10 +171,11 @@ public class Preforme extends Activity implements SensorEventListener,
     							list.add(copySensor.remove(i2));
     						}
     						masterArray.add(list);
-    						Log.d("count", "masterSize: "+masterArray.size());
     						i1 =0;
     					}// end if
     	}// end for
+    	masterArray.add(copySensor);
+    	Log.d("count", "masterSize: "+masterArray.size());
     }//end method
     public double[] processData(ArrayList<Double> calibY){
     	ArrayList<Double> fixedMaster = new ArrayList<Double>();
@@ -289,7 +288,7 @@ public class Preforme extends Activity implements SensorEventListener,
 				Log.d("count", "sensorSize: "+sensorData.size());
 
         }//end if
-        
+        		//change 37 to clibration size
     	if(sensorData.size() == calibration.size()*amountTime){
     		//unregister sensor data 
     		sensorManager.unregisterListener(this);

@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.view.Menu;
 import android.widget.TextView;
 
-//display total error
-//display average error
+//display total error -done
+//display average error - done
 
 
 public class Progress extends Activity {
@@ -19,21 +19,24 @@ public class Progress extends Activity {
 		
 		Intent intent = getIntent();
 		double[] myDiff = intent.getDoubleArrayExtra("diffrence");
-		String val ="value: ";
-		
+		String total ="total Error: ";
+		String average ="\n"+"averageError: ";
+		String results;
+		double tError = 0;
+		double aError = 0;
 		TextView myView = new TextView(this);
-		myView.setTextSize(20); 
+		myView.setTextSize(20);
 		
-		for(double result:myDiff){
+		 tError=totalError(myDiff);
+		 
+		 aError = averageError(myDiff);
 		
-		    
-			myView.setText(val+result);
+		 results = total+tError+average+aError;
 	
-		//myView.setText(ArraySize+myDiff.length);
-			
-		}
+		myView.setText(results);
 		setContentView(myView);
-	}
+		}	
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -42,4 +45,30 @@ public class Progress extends Activity {
 		return true;
 	}
 
-}
+	//method to find the total error
+	public double totalError(double[] myDiff){
+		double totalError =0;
+
+		
+		for(double result:myDiff){
+			totalError+= result;
+		
+		}
+		return totalError;
+	}// end totalError method
+	
+	//method to find the average error
+	public double averageError(double[] myDiff){
+		double avgError =0;
+		
+		for(double result:myDiff){
+			avgError += result;
+		}
+		avgError=avgError/myDiff.length;
+		return avgError;
+		
+	}//end averageError
+}//end class
+
+
+	
