@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-
+// make a youtube vid demoing how to use your app
 public class Welcome extends Activity {
 
 	@Override

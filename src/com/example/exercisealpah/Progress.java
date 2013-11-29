@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.view.Menu;
 import android.widget.TextView;
 
+//display total error
+//display average error
+
+
 public class Progress extends Activity {
 
 	@Override

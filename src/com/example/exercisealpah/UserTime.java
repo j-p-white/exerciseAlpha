@@ -79,7 +79,7 @@ public class UserTime extends Activity {
 						int userTime = Integer.parseInt(timeF.getText().toString());
 
 						//how many times can calibration fit into the user time
-						  amountFit= userTime/length;
+						  amountFit= userTime*length;
 						  
 						  Log.d("", "length: "+length);
 						  Log.d("amountFit","AmountFit: "+amountFit);

@@ -104,16 +104,70 @@ public class Preforme extends Activity implements SensorEventListener,
         super.onResume();
  
     }
+    public double[] workWithData(ArrayList<Double>calibY,ArrayList<AccelData>copySensor){
+    	getDataParsed(copySensor);
+    	correctData();
+    	//normalizeData();
+    	return processData(calibY);
+    	
+    	
+    }//end work with data method
+    
+    //corrects Y points
+    public void correctData(){
+    	AccelData tempY;
+    	AccelData myData;
+    	ArrayList<AccelData>temp = new ArrayList<AccelData>();
+    	for(int j =0; j < masterArray.size();j++){
+    		
+    			 temp= masterArray.remove(j);
+    		
+    		for(int i =0; i < temp.size();i++){
+    			   myData = temp.get(i);
+    			   
+    			   if(myData.getY()<=-0){
+    				 tempY=temp.remove(i);
+    				 tempY.setY(myData.getY()*-1);
+    				 temp.add(i, tempY);
+    			   
+    			}//end if
+    			
+    		}//end checking the data
+    		
+    		masterArray.add(j, temp);
+    		
+    	}//end getting the arrayList
+    	
+    }// end correctData
+    
+    public void normalizeData(){
+    	ArrayList<AccelData>temp = new ArrayList<AccelData>();
+    	AccelData tempData ;
+    	AccelData myData; 
+    	for(int i =0; i < masterArray.size();i++){
+    		temp = masterArray.remove(i);
+    		
+    		for(int j =0; j<temp.size();j++){
+    			 myData = temp.remove(j);
+    			 //myData.setX(myData.getX()/i+1);
+    			 myData.setY(myData.getY()/i+1);
+    			 //myData.setZ(myData.getZ()/i+1);
+    			 temp.add(j, myData);
+    		}//end for normalizing the values
+    		masterArray.add(i, temp);
+    		
+    	}//end for getting array
+   
+    }//end normalizeData
+    
     
     public void getDataParsed(ArrayList<AccelData> copySensor){
     	// variables
     	ArrayList<AccelData>list = new ArrayList<AccelData>();
-    	int count =0;
-    	
+    	Log.d("", "copySensorSize: "+copySensor.size());
     	for(int i1 =0; i1 < copySensor.size();i1++){
     				       //here need more work!
     					if(i1 == 37){
-    						count++;
     						//for all the elements up to 37
     						for(int i2 =0; i2 < i1;i2++){
     							list.add(copySensor.remove(i2));
@@ -121,8 +175,7 @@ public class Preforme extends Activity implements SensorEventListener,
     						masterArray.add(list);
     						Log.d("count", "masterSize: "+masterArray.size());
     						i1 =0;
-    						Log.d("amount","parsedData: "+count+" times");
-    					}
+    					}// end if
     	}// end for
     }//end method
     public double[] processData(ArrayList<Double> calibY){
@@ -132,6 +185,7 @@ public class Preforme extends Activity implements SensorEventListener,
     	double totalDiff = 0;
     	double [] savedDiff = new double[masterArray.size()];
     	int amount =0;
+    	
     	for(ArrayList<AccelData>temp:masterArray){	
     					fixedMaster = calcLift(temp);
     	
@@ -139,14 +193,17 @@ public class Preforme extends Activity implements SensorEventListener,
     				for(int i =0; i < calibY.size();i++){
     					 masterVal = fixedMaster.get(i);
     					  calibVal = calibY.get(i);
-    					  
+    					  Log.d("", "masterVal is: "+masterVal);
     					  totalDiff+= (masterVal - calibVal)/calibVal;	
     					
     			          masterVal =0;
     			          calibVal = 0;
     					  
-    					  Log.d("tag", "totalDiff: "+totalDiff);
+    					 // Log.d("tag", "totalDiff: "+totalDiff);
     				}//end for
+    				if(totalDiff <=-0){
+    				   totalDiff = totalDiff*-1;
+    				}
     				savedDiff[amount] = totalDiff;
     				amount++;
     	}//end foreach
@@ -277,8 +334,7 @@ public class Preforme extends Activity implements SensorEventListener,
             sensorManager.unregisterListener(this);
             layout.removeAllViews();
             
-          getDataParsed(copySensor);
-          diffrence = processData(calibY);
+            diffrence = workWithData(calibY,copySensor);
             
            // openChart2();//never took the y out of master arrayValues
             Intent lastScreen = new Intent(Preforme.this,Progress.class);
