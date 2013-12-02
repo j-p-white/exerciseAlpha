@@ -17,5 +17,7 @@
     <string name="title_activity_movment">Movment</string>
     <string name="title_activity_you_tube">YouTube</string>
     <string name="title_activity_progress">Progress</string>
+    <string name="title_activity_directions">Directions</string>
+    <string name="next">Next</string>
 
 </resources>

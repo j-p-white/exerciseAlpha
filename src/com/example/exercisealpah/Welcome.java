@@ -25,7 +25,7 @@ public class Welcome extends Activity {
 				try {
 					sleep(3000);
 
-					Intent intent = new Intent(Welcome.this,Exercise.class);
+					Intent intent = new Intent(Welcome.this,Directions.class);
 					Log.d("DEBUG", "starting exercise?");
 					startActivity(intent);
 				} catch (InterruptedException e) {

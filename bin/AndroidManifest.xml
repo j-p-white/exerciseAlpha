@@ -54,6 +54,10 @@
             android:name="com.example.exercisealpah.Progress"
             android:label="@string/title_activity_progress" >
         </activity>
+        <activity
+            android:name="com.example.exercisealpah.Directions"
+            android:label="@string/title_activity_directions" >
+        </activity>
     </application>
 
 </manifest>

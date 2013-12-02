@@ -314,7 +314,13 @@ public class Preforme extends Activity implements SensorEventListener,
             sensorData = new ArrayList();
             started = true;
             // save prev data if available
-          
+			try {
+				Thread.sleep(3*1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			r.play();
          //master is still broken-not saving sensorData 
             
             Sensor accel = sensorManager
